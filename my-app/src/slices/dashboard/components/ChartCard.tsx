@@ -1,0 +1,183 @@
+
+import { Card, CardContent, CardHeader, Typography, Box } from '@mui/material';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import type { ChartData, TicketTrend } from '../types';
+
+// Ensure ChartData has an index signature for compatibility with ChartDataInput
+type ChartDataInput = {
+  [key: string]: string | number | undefined;
+  name: string;
+  value: number;
+  color?: string;
+};
+
+interface ChartCardProps {
+  title: string;
+  type: 'pie' | 'bar' | 'line';
+  data: ChartData[] | TicketTrend[];
+  height?: number;
+  isLoading?: boolean;
+}
+
+export const ChartCard: React.FC<ChartCardProps> = ({
+  title,
+  type,
+  data,
+  height = 300,
+  isLoading = false,
+}) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            p: 1.5,
+            borderRadius: 1,
+            boxShadow: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          {label && (
+            <Typography variant="caption" color="text.secondary">
+              {label}
+            </Typography>
+          )}
+          {payload.map((pld: any, index: number) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: pld.color,
+                }}
+              />
+              <Typography variant="body2">
+                {pld.name}: {pld.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      );
+    }
+    return null;
+  };
+
+  const renderChart = () => {
+    if (type === 'pie') {
+      const pieData = (data as ChartData[]).map((item) => ({ ...item })) as ChartDataInput[];
+      return (
+        <ResponsiveContainer width="100%" height={height}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+              label={({ name, value }) => `${name}: ${value}`}
+              labelLine={false}
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color || `hsl(${index * 45}, 70%, 60%)`} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    if (type === 'bar') {
+      const barData = data as ChartData[];
+      return (
+        <ResponsiveContainer width="100%" height={height}>
+          <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis 
+              dataKey="name" 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#e0e0e0' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#e0e0e0' }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar 
+              dataKey="value" 
+              fill="#8B5CF6"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    if (type === 'line') {
+      const lineData = data as TicketTrend[];
+      return (
+        <ResponsiveContainer width="100%" height={height}>
+          <LineChart data={lineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis 
+              dataKey="date" 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#e0e0e0' }}
+              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#e0e0e0' }}
+            />
+            <Tooltip 
+              content={<CustomTooltip />}
+              labelFormatter={(value) => new Date(value).toLocaleDateString()}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="created" 
+              stroke="#8B5CF6" 
+              strokeWidth={3}
+              dot={{ fill: '#8B5CF6', r: 4 }}
+              name="Created"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="resolved" 
+              stroke="#34D399" 
+              strokeWidth={3}
+              dot={{ fill: '#34D399', r: 4 }}
+              name="Resolved"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="open" 
+              stroke="#FB7185" 
+              strokeWidth={3}
+              dot={{ fill: '#FB7185', r: 4 }}
+              name="Open"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Card sx={{ height: '100%' }}>
+      <CardHeader
+        title={title}
+        titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
+      />
+      <CardContent sx={{ pt: 0 }}>
+        {renderChart()}
+      </CardContent>
+    </Card>
+  );
+};
