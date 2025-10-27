@@ -19,13 +19,74 @@ import {
   useTicketsByPriorityQuery,
   useTicketTrendsQuery 
 } from '../hooks';
-import type { Page } from '../../../App';
 
 interface DashboardPageProps {
   userRole: string;
-  onNavigate: (page: Page) => void;
+  onNavigate: (page: string) => void;
   onViewTicket: (ticketId: string) => void;
 }
+
+// Mock data for employee tickets
+const mockEmployeeTickets = [
+  {
+    id: 'TKT-001',
+    title: 'Email not working',
+    status: 'Open' as const,
+    priority: 'High' as const,
+    createdAt: '2025-10-20T10:30:00',
+    slaHours: 18,
+  },
+  {
+    id: 'TKT-005',
+    title: 'Account access issue',
+    status: 'In Progress' as const,
+    priority: 'High' as const,
+    createdAt: '2025-10-19T08:15:00',
+    slaHours: 5,
+  },
+  {
+    id: 'TKT-012',
+    title: 'Software installation request',
+    status: 'Waiting' as const,
+    priority: 'Medium' as const,
+    createdAt: '2025-10-18T14:20:00',
+    slaHours: 32,
+  },
+];
+
+// Mock data for manager team tickets
+const mockTeamTickets = [
+  {
+    id: 'TKT-001',
+    title: 'Email not working',
+    status: 'Open' as const,
+    priority: 'High' as const,
+    assignee: 'Jane Smith',
+    department: 'IT',
+    createdAt: '2025-10-20T10:30:00',
+    slaBreach: false,
+  },
+  {
+    id: 'TKT-002',
+    title: 'Printer not responding',
+    status: 'In Progress' as const,
+    priority: 'Medium' as const,
+    assignee: 'Bob Williams',
+    department: 'IT',
+    createdAt: '2025-10-19T14:20:00',
+    slaBreach: false,
+  },
+  {
+    id: 'TKT-003',
+    title: 'VPN connection issues',
+    status: 'Waiting' as const,
+    priority: 'Critical' as const,
+    assignee: 'Diana Prince',
+    department: 'IT',
+    createdAt: '2025-10-17T11:00:00',
+    slaBreach: true,
+  },
+];
 
 export const DashboardPage = ({
   userRole,
@@ -51,15 +112,6 @@ export const DashboardPage = ({
       default:
         return 'Dashboard';
     }
-  };
-
-  type StatCardData = {
-    title: string;
-    value: number | string;
-    subtitle: string;
-    icon: React.ReactElement;
-    color: 'primary' | 'warning' | 'success' | 'error' | 'info';
-    trend?: { value: number; isPositive: boolean };
   };
 
   const getStatsForRole = (role: string) => {
@@ -100,7 +152,6 @@ export const DashboardPage = ({
           subtitle: 'Total submitted',
           icon: <ConfirmationNumber />,
           color: 'primary' as const,
-          trend: undefined,
         },
         {
           title: 'Open',
@@ -108,7 +159,6 @@ export const DashboardPage = ({
           subtitle: 'In progress',
           icon: <Schedule />,
           color: 'warning' as const,
-          trend: undefined,
         },
         {
           title: 'Avg Resolution',
@@ -116,7 +166,6 @@ export const DashboardPage = ({
           subtitle: 'Average time',
           icon: <CheckCircle />,
           color: 'info' as const,
-          trend: undefined,
         },
       ];
     }
@@ -148,9 +197,10 @@ export const DashboardPage = ({
       ];
     }
 
+    return baseStats;
   };
 
-  const statsData: StatCardData[] = getStatsForRole(userRole) ?? [];
+  const statsData = getStatsForRole(userRole);
 
   if (statsLoading) {
     return <LoadingState variant="card" count={6} />;

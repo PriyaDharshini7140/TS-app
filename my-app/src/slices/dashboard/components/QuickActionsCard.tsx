@@ -6,7 +6,7 @@ interface QuickAction {
   id: string;
   label: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType;
   color: 'primary' | 'secondary' | 'info' | 'warning' | 'error' | 'success';
   onClick: () => void;
 }

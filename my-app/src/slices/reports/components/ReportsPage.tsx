@@ -103,7 +103,7 @@ export const ReportsPage = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ width: '100%', maxWidth: '100%' }}>
+      <Box>
         {/* Header */}
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
@@ -125,7 +125,7 @@ export const ReportsPage = () => {
         </Box>
 
         {/* Filters */}
-  <Paper sx={{ p: 3, mb: 3, width: '100%', maxWidth: '100%' }}>
+        <Paper sx={{ p: 3, mb: 3 }}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={6} md={3}>
               <TextField
@@ -187,7 +187,7 @@ export const ReportsPage = () => {
         </Paper>
 
         {/* Stats Cards */}
-  <Grid container spacing={3} sx={{ mb: 4, width: '100%' }}>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Tickets"
@@ -230,7 +230,7 @@ export const ReportsPage = () => {
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {/* Ticket Trends */}
           <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, width: '100%', maxWidth: '100%' }}>
+            <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Ticket Trends (7 Days)
               </Typography>
@@ -251,7 +251,7 @@ export const ReportsPage = () => {
 
           {/* Tickets by Status */}
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, width: '100%', maxWidth: '100%' }}>
+            <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Tickets by Status
               </Typography>
@@ -263,10 +263,7 @@ export const ReportsPage = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={(props) => {
-                      const { name, percent } = props;
-                      return `${name} ${(percent as any * 100).toFixed(0)}%`;
-                    }}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -283,7 +280,7 @@ export const ReportsPage = () => {
 
           {/* Tickets by Priority */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, width: '100%', maxWidth: '100%' }}>
+            <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Tickets by Priority
               </Typography>
@@ -302,7 +299,7 @@ export const ReportsPage = () => {
 
           {/* Department Performance */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, width: '100%', maxWidth: '100%' }}>
+            <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Department Performance
               </Typography>
@@ -322,7 +319,7 @@ export const ReportsPage = () => {
         </Grid>
 
         {/* Department Stats Table */}
-  <Paper sx={{ p: 3, width: '100%', maxWidth: '100%' }}>
+        <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             Department Statistics
           </Typography>

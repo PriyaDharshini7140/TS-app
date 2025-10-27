@@ -1,15 +1,7 @@
 
 import { Card, CardContent, CardHeader, Typography, Box } from '@mui/material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import type { ChartData, TicketTrend } from '../types';
-
-// Ensure ChartData has an index signature for compatibility with ChartDataInput
-type ChartDataInput = {
-  [key: string]: string | number | undefined;
-  name: string;
-  value: number;
-  color?: string;
-};
+import { ChartData, TicketTrend } from '../types';
 
 interface ChartCardProps {
   title: string;
@@ -66,8 +58,27 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   };
 
   const renderChart = () => {
+    if (isLoading) {
+      return (
+        <Box
+          sx={{
+            height,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'grey.50',
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Loading chart...
+          </Typography>
+        </Box>
+      );
+    }
+
     if (type === 'pie') {
-      const pieData = (data as ChartData[]).map((item) => ({ ...item })) as ChartDataInput[];
+      const pieData = data as ChartData[];
       return (
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>

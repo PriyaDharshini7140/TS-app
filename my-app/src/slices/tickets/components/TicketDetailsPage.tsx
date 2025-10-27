@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -35,7 +36,7 @@ import {
 import type { TicketStatus, TicketPriority } from '../../../shared/types';
 
 interface TicketDetailsPageProps {
-  ticketId: string | null;
+  ticketId?: string | null;
 }
 
 interface TabPanelProps {
@@ -127,7 +128,10 @@ const priorityColors: Record<TicketPriority, 'default' | 'primary' | 'secondary'
   'Critical': 'error',
 };
 
-export const TicketDetailsPage = ({ ticketId }: TicketDetailsPageProps) => {
+export const TicketDetailsPage = ({ ticketId: propTicketId }: TicketDetailsPageProps) => {
+  const params = useParams();
+  const navigate = useNavigate();
+  const ticketId = propTicketId || params.id;
   const [comment, setComment] = useState('');
   const [tabValue, setTabValue] = useState(0);
 
@@ -153,7 +157,7 @@ export const TicketDetailsPage = ({ ticketId }: TicketDetailsPageProps) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
             <Button
               startIcon={<ArrowBack />}
-              onClick={() => window.history.back()}
+              onClick={() => navigate('/tickets')}
               variant="outlined"
             >
               Back

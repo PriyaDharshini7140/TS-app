@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -9,8 +9,8 @@ import {
   Switch,
   Alert,
 } from '@mui/material';
-import type { CreateUserData, UpdateUserData, UserFormErrors } from '../types';
-import type { User } from '../../../shared/types';
+import { CreateUserData, UpdateUserData, UserFormErrors } from '../types';
+import { User } from '../../../shared/types';
 
 interface UserFormProps {
   user?: User | null;
@@ -134,7 +134,7 @@ export const UserForm: React.FC<UserFormProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear field error when user starts typing
-    if (field in errors) {
+    if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };

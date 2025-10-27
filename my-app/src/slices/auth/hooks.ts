@@ -1,7 +1,7 @@
 // RTK Query hooks for authentication
 // These are placeholders - replace with actual RTK Query implementation
 
-import type { LoginCredentials, SignupData, ForgotPasswordData, AuthResponse } from './types';
+import { LoginCredentials, SignupData, ForgotPasswordData, AuthResponse } from './types';
 
 // Mock API responses for development
 const mockAuthResponse: AuthResponse = {

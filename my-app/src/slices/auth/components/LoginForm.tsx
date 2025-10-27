@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import {
   Box,
   TextField,
@@ -13,8 +15,19 @@ import {
   InputAdornment,
   IconButton,
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Email, Lock, ConfirmationNumber } from '@mui/icons-material';
 import type { LoginCredentials } from '../types';
+
+// Validation schema
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+  rememberMe: Yup.boolean(),
+});
 
 interface LoginFormProps {
   onLogin: (credentials: LoginCredentials) => Promise<void>;
@@ -31,56 +44,23 @@ export const LoginForm = ({
   isLoading = false,
   error = null,
 }: LoginFormProps) => {
-  const [formData, setFormData] = useState<LoginCredentials>({
-    email: '',
-    password: '',
-    rememberMe: false,
-  });
   const [showPassword, setShowPassword] = useState(false);
-  const [formErrors, setFormErrors] = useState<Partial<LoginCredentials>>({});
 
-  const validateForm = (): boolean => {
-    const errors: Partial<LoginCredentials> = {};
-
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email is invalid';
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    try {
-      await onLogin(formData);
-    } catch (err) {
-      // Error is handled by parent component
-    }
-  };
-
-  const handleInputChange = (field: keyof LoginCredentials) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear field error when user starts typing
-    if (formErrors[field]) {
-      setFormErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        await onLogin(values);
+      } catch (err) {
+        // Error is handled by parent component
+      }
+    },
+  });
 
   return (
     <Box
@@ -103,11 +83,25 @@ export const LoginForm = ({
       >
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #A8C5E6 0%, #E8B4BC 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+              }}
+            >
+              <ConfirmationNumber sx={{ fontSize: 40, color: 'white' }} />
+            </Box>
             <Typography variant="h4" component="h1" gutterBottom>
               Welcome Back
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Sign in to your IT Ticketing account
+              Sign in to your IT Ticketing System
             </Typography>
           </Box>
 
@@ -117,15 +111,17 @@ export const LoginForm = ({
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} noValidate>
+          <Box component="form" onSubmit={formik.handleSubmit} noValidate>
             <TextField
               fullWidth
               label="Email Address"
               type="email"
-              value={formData.email}
-              onChange={handleInputChange('email')}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
               margin="normal"
               required
               autoComplete="email"
@@ -144,10 +140,12 @@ export const LoginForm = ({
               fullWidth
               label="Password"
               type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleInputChange('password')}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
+              name="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
               margin="normal"
               required
               autoComplete="current-password"
@@ -175,8 +173,9 @@ export const LoginForm = ({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={formData.rememberMe}
-                    onChange={handleInputChange('rememberMe')}
+                    name="rememberMe"
+                    checked={formik.values.rememberMe}
+                    onChange={formik.handleChange}
                     color="primary"
                   />
                 }
@@ -198,6 +197,30 @@ export const LoginForm = ({
               fullWidth
               variant="contained"
               size="large"
+              disabled={isLoading || formik.isSubmitting}
+              sx={{
+                mb: 2,
+                py: 1.5,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '1rem',
+              }}
+            >
+              {isLoading || formik.isSubmitting ? 'Signing In...' : 'Sign In'}
+            </Button>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+              <Typography variant="body2" sx={{ px: 2, color: 'text.secondary' }}>
+                OR
+              </Typography>
+              <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+            </Box>
+
+            <Button
+              fullWidth
+              variant="outlined"
+              size="large"
               disabled={isLoading}
               sx={{
                 mb: 3,
@@ -205,9 +228,13 @@ export const LoginForm = ({
                 borderRadius: 2,
                 textTransform: 'none',
                 fontSize: '1rem',
+                borderWidth: 2,
+                '&:hover': {
+                  borderWidth: 2,
+                },
               }}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              Sign in with SSO
             </Button>
 
             <Box sx={{ textAlign: 'center' }}>

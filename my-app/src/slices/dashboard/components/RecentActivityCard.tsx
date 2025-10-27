@@ -21,7 +21,7 @@ import {
   Edit,
   MoreHoriz 
 } from '@mui/icons-material';
-import type { RecentActivity } from '../types';
+import { RecentActivity } from '../types';
 
 interface RecentActivityCardProps {
   activities: RecentActivity[];
@@ -158,6 +158,7 @@ export const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
+                  disableTypography
                   primary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -190,6 +191,7 @@ export const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
                       <Typography 
                         variant="caption" 
                         color="text.secondary"
+                        component="div"
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
                         <span>{activity.user}</span>

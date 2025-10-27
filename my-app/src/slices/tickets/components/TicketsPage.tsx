@@ -1,44 +1,34 @@
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Paper,
   Typography,
   Button,
   TextField,
-  InputAdornment,
   MenuItem,
   Chip,
   IconButton,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTitle,
 } from '@mui/material';
 import {
-  Search,
   Add,
   FilterList,
   Refresh,
   Visibility,
   Edit,
   Delete,
+  Close,
 } from '@mui/icons-material';
 import type { Ticket, TicketStatus, TicketPriority } from '../../../shared/types';
+import { DataGrid, Column, createDateColumn } from '../../../shared/components/DataGrid';
+import { CreateTicketForm } from './CreateTicketForm';
 
-interface TicketsPageProps {
-  onViewTicket?: (ticketId: string) => void;
-}
+interface TicketsPageProps {}
 
 // Mock data
 const mockTickets = [
@@ -119,50 +109,116 @@ const priorityColors: Record<TicketPriority, 'default' | 'primary' | 'secondary'
   'Critical': 'error',
 };
 
-export const TicketsPage = ({ onViewTicket }: TicketsPageProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
+export const TicketsPage = ({}: TicketsPageProps) => {
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const handleCreateTicket = () => {
+    setCreateDialogOpen(false);
+    // Refresh tickets list here
+  };
 
   const filteredTickets = mockTickets.filter((ticket) => {
-    const matchesSearch = ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket.id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesStatus && matchesPriority;
   });
 
-  const paginatedTickets = filteredTickets.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelected(paginatedTickets.map((ticket) => ticket.id));
-    } else {
-      setSelected([]);
-    }
-  };
-
-  const handleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  const columns: Column[] = [
+    {
+      field: 'id',
+      headerName: 'Ticket ID',
+      width: 120,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+          {params.value}
+        </Typography>
+      ),
+    },
+    {
+      field: 'title',
+      headerName: 'Title',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 140,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={statusColors[params.value as TicketStatus]}
+          size="small"
+          sx={{ fontWeight: 500 }}
+        />
+      ),
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={priorityColors[params.value as TicketPriority]}
+          size="small"
+          variant="outlined"
+          sx={{ fontWeight: 500 }}
+        />
+      ),
+    },
+    {
+      field: 'category',
+      headerName: 'Category',
+      width: 130,
+    },
+    {
+      field: 'assignedTo',
+      headerName: 'Assigned To',
+      width: 150,
+    },
+    {
+      field: 'department',
+      headerName: 'Department',
+      width: 130,
+    },
+    createDateColumn('createdAt', 'Created', 180),
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      filterable: false,
+      align: 'center',
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <Tooltip title="View Details">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => navigate(`/tickets/${params.row.id}`)}
+            >
+              <Visibility fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit">
+            <IconButton size="small" color="primary">
+              <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton size="small" color="error">
+              <Delete fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
 
   return (
     <Box>
@@ -189,22 +245,7 @@ export const TicketsPage = ({ onViewTicket }: TicketsPageProps) => {
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              placeholder="Search tickets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
               select
               fullWidth
@@ -220,7 +261,7 @@ export const TicketsPage = ({ onViewTicket }: TicketsPageProps) => {
               <MenuItem value="Closed">Closed</MenuItem>
             </TextField>
           </Grid>
-          <Grid item xs={12} sm={6} md={2}>
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
               select
               fullWidth
@@ -235,8 +276,8 @@ export const TicketsPage = ({ onViewTicket }: TicketsPageProps) => {
               <MenuItem value="Critical">Critical</MenuItem>
             </TextField>
           </Grid>
-          <Grid item xs={12} md={2}>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
               <Tooltip title="Refresh">
                 <IconButton color="primary">
                   <Refresh />
@@ -252,178 +293,55 @@ export const TicketsPage = ({ onViewTicket }: TicketsPageProps) => {
         </Grid>
       </Paper>
 
-      {/* Table */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 600 }}>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={selected.length > 0 && selected.length < paginatedTickets.length}
-                    checked={paginatedTickets.length > 0 && selected.length === paginatedTickets.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                <TableCell>Ticket ID</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Priority</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Assigned To</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedTickets.map((ticket) => (
-                <TableRow
-                  key={ticket.id}
-                  hover
-                  selected={selected.includes(ticket.id)}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selected.includes(ticket.id)}
-                      onChange={() => handleSelect(ticket.id)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                      {ticket.id}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{ticket.title}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={ticket.status}
-                      color={statusColors[ticket.status]}
-                      size="small"
-                      sx={{ fontWeight: 500 }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={ticket.priority}
-                      color={priorityColors[ticket.priority]}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontWeight: 500 }}
-                    />
-                  </TableCell>
-                  <TableCell>{ticket.category}</TableCell>
-                  <TableCell>{ticket.assignedTo}</TableCell>
-                  <TableCell>{ticket.department}</TableCell>
-                  <TableCell>{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell align="center">
-                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                      <Tooltip title="View Details">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => onViewTicket?.(ticket.id)}
-                        >
-                          <Visibility fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit">
-                        <IconButton size="small" color="primary">
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton size="small" color="error">
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          component="div"
-          count={filteredTickets.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+      {/* DataGrid */}
+      <DataGrid
+        rows={filteredTickets}
+        columns={columns}
+        pageSize={10}
+        checkboxSelection
+        onRowSelectionChange={setSelected}
+        enableToolbar={true}
+        searchPlaceholder="Search tickets by ID, title, or assignee..."
+        height={600}
+      />
 
       {/* Create Ticket Dialog */}
       <Dialog 
         open={createDialogOpen} 
         onClose={() => setCreateDialogOpen(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            maxHeight: '90vh',
+          }
+        }}
       >
-        <DialogTitle>Create New Ticket</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Title"
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Description"
-                  multiline
-                  rows={4}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Priority"
-                  defaultValue="Medium"
-                  required
-                >
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
-                  <MenuItem value="Critical">Critical</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Category"
-                  defaultValue="Software"
-                  required
-                >
-                  <MenuItem value="Hardware">Hardware</MenuItem>
-                  <MenuItem value="Software">Software</MenuItem>
-                  <MenuItem value="Network">Network</MenuItem>
-                  <MenuItem value="Security">Security</MenuItem>
-                  <MenuItem value="Access">Access</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </TextField>
-              </Grid>
-            </Grid>
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          pb: 1,
+        }}>
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+              Create New Ticket
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Submit a new support request
+            </Typography>
           </Box>
+          <IconButton 
+            onClick={() => setCreateDialogOpen(false)}
+            sx={{ color: 'text.secondary' }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <CreateTicketForm onSuccess={handleCreateTicket} onCancel={() => setCreateDialogOpen(false)} />
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setCreateDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={() => setCreateDialogOpen(false)}>
-            Create Ticket
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );

@@ -144,7 +144,7 @@ export const UsersPage = ({ userRole }: UsersPageProps) => {
   }
 
   return (
-  <Box sx={{ width: '100%', maxWidth: '100%' }}>
+    <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
@@ -183,7 +183,7 @@ export const UsersPage = ({ userRole }: UsersPageProps) => {
       </Box>
 
       {/* Stats Cards */}
-  <Grid container spacing={3} sx={{ mb: 4, width: '100%' }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -258,7 +258,7 @@ export const UsersPage = ({ userRole }: UsersPageProps) => {
       </Grid>
 
       {/* Filters */}
-  <Card sx={{ mb: 3, width: '100%', maxWidth: '100%' }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <UserFilters onFiltersChange={handleFiltersChange} />
         </CardContent>
@@ -274,7 +274,7 @@ export const UsersPage = ({ userRole }: UsersPageProps) => {
       )}
 
       {/* Users Table */}
-      <Card sx={{ width: '100%', maxWidth: '100%' }}>
+      <Card>
         <CardContent sx={{ p: 0 }}>
           {users && users.length > 0 ? (
             <UserTable
@@ -312,13 +312,7 @@ export const UsersPage = ({ userRole }: UsersPageProps) => {
         <DialogContent>
           <UserForm
             user={editingUser}
-            onSubmit={(data) => {
-              if (editingUser) {
-                handleUpdateUser(data as UpdateUserData);
-              } else {
-                handleCreateUser(data as CreateUserData);
-              }
-            }}
+            onSubmit={editingUser ? handleUpdateUser : handleCreateUser}
             onCancel={() => {
               setUserFormOpen(false);
               setEditingUser(null);
