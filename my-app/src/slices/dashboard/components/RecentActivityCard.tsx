@@ -21,7 +21,7 @@ import {
   Edit,
   MoreHoriz 
 } from '@mui/icons-material';
-import { RecentActivity } from '../types';
+import type { RecentActivity } from '../types';
 
 interface RecentActivityCardProps {
   activities: RecentActivity[];
