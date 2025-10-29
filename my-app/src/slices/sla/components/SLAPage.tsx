@@ -24,7 +24,7 @@ import {
   Refresh,
   FileDownload,
 } from '@mui/icons-material';
-import { DataGrid, Column, createPriorityColumn, createStatusColumn } from '../../../shared/components/DataGrid';
+import { DataGrid, createPriorityColumn, createStatusColumn, type Column } from '../../../shared/components/DataGrid';
 
 interface SLAPageProps {
   userRole: string;

@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Add, Edit, Delete, Check, Close } from '@mui/icons-material';
-import { DataGrid, Column } from '../../../shared/components/DataGrid';
+import { DataGrid, type Column } from '../../../shared/components/DataGrid';
 
 interface Subcategory {
   id: string;

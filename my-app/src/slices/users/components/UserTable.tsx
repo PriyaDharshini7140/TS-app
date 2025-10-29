@@ -1,7 +1,7 @@
 import { Avatar, Chip, IconButton, Typography, Box } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { User } from '../../../shared/types';
-import { DataGrid, Column, createDateColumn } from '../../../shared/components/DataGrid';
+import { DataGrid, createDateColumn, type Column } from '../../../shared/components/DataGrid';
+import type { User } from '../../../shared/types';
 
 interface UserTableProps {
   users: User[];

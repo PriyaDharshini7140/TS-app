@@ -25,7 +25,7 @@ import {
   Close,
 } from '@mui/icons-material';
 import type { Ticket, TicketStatus, TicketPriority } from '../../../shared/types';
-import { DataGrid, Column, createDateColumn } from '../../../shared/components/DataGrid';
+import { DataGrid,  createDateColumn, type Column } from '../../../shared/components/DataGrid';
 import { CreateTicketForm } from './CreateTicketForm';
 
 interface TicketsPageProps {}

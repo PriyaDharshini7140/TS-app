@@ -16,7 +16,7 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { Add, Edit, Delete, Check, Close, ArrowUpward, ArrowDownward, DragIndicator } from '@mui/icons-material';
-import { DataGrid, Column } from '../../../shared/components/DataGrid';
+import { DataGrid, type Column } from '../../../shared/components/DataGrid';
 
 interface Status {
   id: string;

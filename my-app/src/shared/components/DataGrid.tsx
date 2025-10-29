@@ -279,7 +279,15 @@ export function DataGrid<T extends { id: string }>({
       {loading && <LinearProgress />}
 
       {/* Table */}
-      <TableContainer sx={{ height: autoHeight ? 'auto' : height - 200 }}>
+      <TableContainer
+        sx={{
+          height: autoHeight
+            ? 'auto'
+            : typeof height === 'number'
+            ? height - 200
+            : `calc(${height} - 200px)`,
+        }}
+      >
         <Table stickyHeader>
           <TableHead>
             <TableRow>

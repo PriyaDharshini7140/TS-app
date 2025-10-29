@@ -21,7 +21,7 @@ import {
   Divider,
 } from '@mui/material';
 import { Add, Edit, Delete, People, Security } from '@mui/icons-material';
-import { DataGrid, Column, createDateColumn } from '../../../shared/components/DataGrid';
+import { DataGrid, createDateColumn, type Column } from '../../../shared/components/DataGrid';
 
 interface Role {
   id: string;

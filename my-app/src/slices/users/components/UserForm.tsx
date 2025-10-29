@@ -9,8 +9,8 @@ import {
   Switch,
   Alert,
 } from '@mui/material';
-import { CreateUserData, UpdateUserData, UserFormErrors } from '../types';
-import { User } from '../../../shared/types';
+import type { CreateUserData, UpdateUserData, UserFormErrors } from '../types';
+import type { User } from '../../../shared/types';
 
 interface UserFormProps {
   user?: User | null;
@@ -133,8 +133,11 @@ export const UserForm: React.FC<UserFormProps> = ({
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear field error when user starts typing
-    if (errors[field]) {
+    // Clear field error when user starts typing (only for fields present in UserFormErrors)
+    const isErrorField = (f: keyof CreateUserData): f is keyof UserFormErrors =>
+      ['name', 'email', 'role', 'department', 'password'].includes(f as string);
+
+    if (isErrorField(field) && errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };

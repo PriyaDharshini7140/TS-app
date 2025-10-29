@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { EmptyState } from '../../../shared/components/EmptyState';
 import { LoadingState } from '../../../shared/components/LoadingState';
-import { Department } from '../../../shared/types';
+import type { Department } from '../../../shared/types';
 
 interface DepartmentsPageProps {
   userRole: string;

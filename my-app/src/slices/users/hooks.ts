@@ -1,8 +1,9 @@
 // RTK Query hooks for users management
 // These are placeholders - replace with actual RTK Query implementation
 
-import { User } from '../../shared/types';
-import { CreateUserData, UpdateUserData, UserFilters } from './types';
+import type { User } from "../../shared/types";
+import type { CreateUserData, UpdateUserData, UserFilters } from "./types";
+
 
 // Mock data for development
 const mockUsers: User[] = [

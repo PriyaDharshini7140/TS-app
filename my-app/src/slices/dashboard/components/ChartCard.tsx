@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, Typography, Box } from '@mui/material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { ChartData, TicketTrend } from '../types';
+import type { ChartData, TicketTrend } from '../types';
 
 interface ChartCardProps {
   title: string;
@@ -83,7 +83,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>
             <Pie
-              data={pieData}
+              data={pieData as any}
               cx="50%"
               cy="50%"
               outerRadius={80}

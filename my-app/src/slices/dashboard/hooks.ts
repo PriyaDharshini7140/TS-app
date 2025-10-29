@@ -1,7 +1,7 @@
 // RTK Query hooks for dashboard
 // These are placeholders - replace with actual RTK Query implementation
 
-import { DashboardStats, RecentActivity, ChartData, TicketTrend, DepartmentMetrics } from './types';
+import type { ChartData, DashboardStats, DepartmentMetrics, RecentActivity, TicketTrend } from "./types";
 
 // Mock data for development
 const mockDashboardStats: DashboardStats = {
